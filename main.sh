@@ -23,11 +23,10 @@ else
 
     # Предлагаем варианты
     echo -e "\nOptions:"
-    echo "1) Try to reconnect and check again"
-    echo "2) Continue without internet (NOT recommended)"
-    echo "3) Exit"
+    echo "1) Try to reconnect"
+    echo "2) Exit"
 
-    read -p "Choose an option (1-3): " choice
+    read -p "Choose an option: " choice
 
     case $choice in
         1)
@@ -51,10 +50,6 @@ else
             fi
             ;;
         2)
-            echo "Continuing without internet at your own risk..."
-            ./stage1.sh
-            ;;
-        3)
             echo "Exiting..."
             exit 0
             ;;
