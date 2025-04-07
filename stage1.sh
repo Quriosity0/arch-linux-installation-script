@@ -6,7 +6,7 @@ echo
 echo "Available disks:"
 lsblk -dno NAME,SIZE,MODEL | grep -v "loop"
 
-read -p "Enter disk name (e.g., sda): " disk_name
+read -p "Enter disk name (e.g., sda/nvme0n1): " disk_name
 DISK="/dev/$disk_name"
 
 # Проверка существования диска
@@ -14,8 +14,6 @@ if [ ! -b "$DISK" ]; then
     echo "Error: $DISK doesn't exist!"
     exit 1
 fi
-
-# echo "do you need swap partition?"
 
 # Проверка на наличие разделов
 if lsblk -nlo NAME "$DISK" | grep -q "${disk_name}[0-9]"; then
@@ -28,7 +26,6 @@ if lsblk -nlo NAME "$DISK" | grep -q "${disk_name}[0-9]"; then
         exit 1
     fi
 
-    # Очистка диска (осторожно!)
     echo "Wiping disk..."
     wipefs -a "$DISK"
     sleep 2
@@ -38,18 +35,40 @@ echo -e "\nSelected disk: $DISK"
 parted "$DISK" mklabel gpt
 parted "$DISK" mkpart "EFI" fat32 1MiB 500MiB
 parted "$DISK" set 1 esp on
-parted "$DISK" mkpart "/" ext4 500MiB 100%
+parted "$DISK" mkpart "ROOT" ext4 500MiB 100%
 
 echo -e "\nPartitioning completed. Result:"
 lsblk "$DISK"
-sleep 10
+sleep 2
 
-mkfs.ext4 /dev/sda2
-mkfs.fat -F 32 /dev/sda1
-mount /dev/sda2 /mnt
-mount --mkdir /dev/sda1 /mnt/boot
-sleep 10
-./stage2.sh
+# Определяем имена разделов (для SATA и NVMe)
+if [[ "$DISK" =~ "nvme" ]]; then
+    EFI_PART="${DISK}p1"
+    ROOT_PART="${DISK}p2"
+else
+    EFI_PART="${DISK}1"
+    ROOT_PART="${DISK}2"
+fi
 
-# TODO
-# swapon /dev/swap_partition
+# Форматирование
+echo "Creating filesystems..."
+mkfs.fat -F 32 "$EFI_PART" || { echo "Error creating FAT32"; exit 1; }
+mkfs.ext4 "$ROOT_PART" || { echo "Error creating ext4"; exit 1; }
+
+# Монтирование
+echo "Mounting partitions..."
+mount "$ROOT_PART" /mnt || { echo "Failed to mount root"; exit 1; }
+mount --mkdir "$EFI_PART" /mnt/boot || { echo "Failed to mount EFI"; exit 1; }
+
+echo "Verifying mounts:"
+lsblk -o NAME,MOUNTPOINT "$DISK"
+sleep 2
+
+# Явный переход к stage2
+echo "Starting stage2..."
+if [ -f ./stage2.sh ]; then
+    exec /bin/bash ./stage2.sh
+else
+    echo "Error: stage2.sh not found!"
+    exit 1
+fi
