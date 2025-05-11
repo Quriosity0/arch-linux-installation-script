@@ -13,5 +13,6 @@ curl -O https://raw.githubusercontent.com/Quriosity0/arch-linux-installation-scr
 then, run it with
 ```
 cd arch-linux-installation-script
+chmod +x main.sh
 ./main.sh
 ```
