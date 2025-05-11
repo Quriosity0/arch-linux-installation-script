@@ -47,6 +47,7 @@ EOF
 read -p "Linux kernel installation finished, do you want to continue? (Y/n): " FinishQuestion
 case "$FinishQuestion" in
     y|Y)
+        exec /bin/bash ./stage3.sh
         clear
         ;;
     n|N)
