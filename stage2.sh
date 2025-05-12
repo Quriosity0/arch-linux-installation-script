@@ -18,7 +18,7 @@ echo "ru_RU.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 echo LANG=en_US.UTF-8 > /etc/locale.conf
 echo KEYMAP=us > /etc/vconsole.conf
-echo asus-pc > /etc/hostname
+echo arch-pc > /etc/hostname
 mkinitcpio -P
 exit
 CHROOT
