@@ -17,7 +17,7 @@ mount --bind /sys /mnt/sys
 # instead of arch-chroot using this function
 chroot_exec() {
     arch-chroot /mnt /bin/bash -c "$1" || {
-        echo "Ошибка выполнения команды: $1"
+        echo "error during command execution: $1"
         exit 1
     }
 }
