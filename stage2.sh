@@ -23,10 +23,9 @@ mkinitcpio -P
 exit
 CHROOT
 
-echo "Enter root password: "
-stty -echo
-arch-chroot /mnt passwd
-stty echo
+read -sp "Enter root password: " rootpass
+arch-chroot /mnt bash -c "echo 'root:$rootpass' | chpasswd"
+unset rootpass
 
 # Writing bootloader
 mkdir -p /mnt/boot/loader
