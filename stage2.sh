@@ -2,10 +2,11 @@
 
 clear
 pacman -Sy --noconfirm reflector
-pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bash-completion --parallel-downloads=15
+pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bash-completion
 genfstab -U /mnt >> /mnt/etc/fstab
 reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
 
+# chrooting into system
 arch-chroot /mnt <<'CHROOT'
 clear
 ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
@@ -37,11 +38,9 @@ default arch
 timeout 5
 EOF
 
+# reflector adds new mirrors
+reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
+
 read -p "Linux kernel installation finished"
 sleep 4
 ./stage3.sh
-clear
-
-
-echo "installation finished"
-exit 0
