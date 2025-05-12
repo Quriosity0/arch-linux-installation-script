@@ -77,6 +77,10 @@ else
     sleep 2
     clear
 
+    # changing parallel downloads for pacman
+    # echo "changing parallel downloads to 15"
+    # sed -i 's/^#\?ParallelDownloads = .*/ParallelDownloads = 15/' /etc/pacman.conf
+
     # Установка DE/WM
     read -p "Would you like to install a desktop environment? (Y/n): " install_de
     if [[ "$install_de" =~ ^[Yy]$ || -z "$install_de" ]]; then
@@ -134,9 +138,6 @@ else
         reflector
     systemctl enable NetworkManager
     clear
-
-    # changing parallel downloads for pacman
-    # sed -i 's/^#\?ParallelDownloads = .*/ParallelDownloads = 15/' /etc/pacman.conf
 
     # Настройка sudo
     echo "Configuring sudo for wheel group..."
