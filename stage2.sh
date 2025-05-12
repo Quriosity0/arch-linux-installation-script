@@ -52,7 +52,7 @@ CHROOT
 
 cat > /mnt/boot/loader/loader.conf <<EOF
 default arch
-timeout 3
+timeout 5
 EOF
 
 read -p "Linux kernel installation finished"
