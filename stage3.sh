@@ -1,6 +1,22 @@
 #!/bin/bash
 
-set -e
+read -sp "Enter root password: " rootpass
+arch-chroot /mnt bash -c "echo 'root:$rootpass' | chpasswd"
+unset rootpass
+
+# Writing bootloader
+mkdir -p /mnt/boot/loader
+cat > /mnt/boot/loader/loader.conf <<EOF
+default arch
+timeout 5
+EOF
+clear
+
+# reflector adds new mirrors
+reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
+
+read -p "Linux kernel installation finished"
+sleep 5
 clear
 
 # Путь установки
@@ -146,11 +162,12 @@ else
     # Установка yay и flatpak
     clear
     echo "Installing yay..."
-    sudo -u "$username" git clone https://aur.archlinux.org/yay.git /home/"$username"/yay
-    cd /home/"$username"/yay
-    sudo -u "$username" makepkg -si --noconfirm
-    cd ~
-    rm -rf /home/"$username"/yay
+    cd /home/"$username" || echo "directory not found"
+    git clone https://aur.archlinux.org/yay.git 
+    cd yay || echo "directory \"yay\" not found"
+    sudo makepkg -si --noconfirm
+    cd /home/"$username" || echo "directory not found"
+    rm -rf yay
     
     clear
     echo "Installing flatpak..."
