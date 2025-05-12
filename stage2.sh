@@ -44,23 +44,11 @@ default arch
 timeout 3
 EOF
 
-read -p "Linux kernel installation finished, do you want to continue? (Y/n): " FinishQuestion
-case "$FinishQuestion" in
-    y|Y)
-        exec /bin/bash ./stage3.sh
-        clear
-        ;;
-    n|N)
-        echo "Exiting installation..."
-        sleep 2
-        exit 0
-        ;;
-    *)
-        echo "Invalid input. Continuing installation by default."
-        sleep 2
-        clear
-        ;;
-esac
+read -p "Linux kernel installation finished"
+sleep 4
+./stage3.sh
+clear
+
 
 echo "installation finished"
 exit 0
