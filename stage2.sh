@@ -2,7 +2,7 @@
 
 clear
 pacman -Sy --noconfirm reflector
-pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bash-completion pacstrap -K /mnt base linux linux-firmware
+pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bash-completion --parallel-downloads=15
 genfstab -U /mnt >> /mnt/etc/fstab
 reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
 
@@ -31,15 +31,11 @@ bootctl install
 exit
 CHROOT
 
-touch /mnt/boot/loader/loader.conf
-echo "default arch" > /mnt/boot/loader/loader.conf
-echo "timeout 5" >> /mnt/boot/loader/loader.conf
-
-
-# cat > /mnt/boot/loader/loader.conf <<EOF
-# default arch
-# timeout 5
-# EOF
+mkdir -p /mnt/boot/loader
+cat > /mnt/boot/loader/loader.conf <<EOF
+default arch
+timeout 5
+EOF
 
 read -p "Linux kernel installation finished"
 sleep 4
