@@ -50,10 +50,15 @@ bootctl install
 exit
 CHROOT
 
-cat > /mnt/boot/loader/loader.conf <<EOF
-default arch
-timeout 5
-EOF
+touch /mnt/boot/loader/loader.conf
+echo "default arch" > /mnt/boot/loader/loader.conf
+echo "timeout 5" >> /mnt/boot/loader/loader.conf
+
+
+# cat > /mnt/boot/loader/loader.conf <<EOF
+# default arch
+# timeout 5
+# EOF
 
 read -p "Linux kernel installation finished"
 sleep 4
