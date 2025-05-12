@@ -54,7 +54,7 @@ else
     sleep 2
     clear
 
-    #
+    # 
 
     # установка DE
     read -p "Would you like to install a desktop environment? (Y/n): " install_de

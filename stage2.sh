@@ -6,35 +6,23 @@ pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bas
 genfstab -U /mnt >> /mnt/etc/fstab
 reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
 
-# chrooting into system
+# Chrooting into system
 arch-chroot /mnt <<'CHROOT'
-clear
 ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
 hwclock --systohc
-
 echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 echo "ru_RU.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
-
-cd /etc/
-echo LANG=en_US.UTF-8 > locale.conf
-
-echo KEYMAP=us > vconsole.conf
-
-echo asus-pc > hostname
-
+echo LANG=en_US.UTF-8 > /etc/locale.conf
+echo KEYMAP=us > /etc/vconsole.conf
+echo asus-pc > /etc/hostname
 mkinitcpio -P
 exit
 CHROOT
 
-echo "enter new root password"
-
-arch-chroot /mnt <<'CHROOT'
-passwd
-
-bootctl install
-exit
-CHROOT
+echo "Enter root pasword"
+arch-chroot /mnt passwd
+arch-chroot /mnt bootctl install
 
 # Writing bootloader
 mkdir -p /mnt/boot/loader
