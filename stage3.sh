@@ -3,18 +3,18 @@
 set -e
 clear
 
-# finding installation path
+# Путь установки
 INSTALL_DIR="/tmp/InstallScript"
 
-# Checking chroot or not
-if ! grep -q '/mnt' /proc/mounts; then
-    # if not - copying files into system
+# Проверяем, что мы уже в новой системе (не в установочной среде)
+if [[ ! -f /etc/arch-release ]]; then
+    # Если ещё в установочной среде — копируем файлы и настраиваем автозапуск
     echo "Copying installation files to the new system..."
     mkdir -p /mnt"$INSTALL_DIR"
     cp -r "$INSTALL_DIR"/* /mnt"$INSTALL_DIR"/
     chmod +x /mnt"$INSTALL_DIR"/*.sh
 
-    # creating autostart service
+    # Создаём сервис в /mnt/etc (после перезагрузки это станет /etc)
     echo "Setting up auto-start after reboot..."
     cat > /mnt/etc/systemd/system/continue_install.service <<EOF
 [Unit]
@@ -30,34 +30,54 @@ WorkingDirectory=$INSTALL_DIR
 WantedBy=multi-user.target
 EOF
 
-    # turning service on
-    arch-chroot /mnt systemctl enable continue_install.service
+    # Проверяем, что сервис создан
+    if [[ ! -f /mnt/etc/systemd/system/continue_install.service ]]; then
+        echo "ERROR: Failed to create service file!"
+        exit 1
+    fi
+
+    # Включаем сервис в chroot
+    arch-chroot /mnt systemctl daemon-reload
+    arch-chroot /mnt systemctl enable continue_install.service --now
 
     echo "Installation files copied. The system will now reboot."
     echo "After reboot, the installation will continue automatically."
     read -p "Press Enter to reboot..."
     reboot
 else
+    # Если мы уже в новой системе — продолжаем установку
     echo "Continuing installation..."
     
-    # turning service off
-    systemctl disable continue_install.service
-    rm /etc/systemd/system/continue_install.service
+    # Отключаем сервис (чтобы не запускался снова)
+    systemctl disable continue_install.service || true
+    rm -f /etc/systemd/system/continue_install.service
+    systemctl daemon-reload
     clear
     
-    # creating user
-    echo "creating new user"
+    # Создание пользователя
+    echo "Creating new user"
     read -p "Enter username: " username
     useradd -m -G wheel "$username"
-    passwd "$username"
+    
+    # Безопасный ввод пароля
+    while true; do
+        read -sp "Enter password for $username: " password
+        echo
+        read -sp "Confirm password: " password_confirm
+        echo
+        if [[ "$password" == "$password_confirm" ]]; then
+            echo "$username:$password" | chpasswd
+            break
+        else
+            echo "Passwords don't match. Try again."
+        fi
+    done
+    
     echo "User $username created."
     sleep 2
     clear
 
-    # changing parallel downloads for pacman
-    # sed -i 's/^#\?ParallelDownloads = .*/ParallelDownloads = 15/' /etc/pacman.conf
-
-    # installing DE/WM
+    # Установка DE/WM
     read -p "Would you like to install a desktop environment? (Y/n): " install_de
     if [[ "$install_de" =~ ^[Yy]$ || -z "$install_de" ]]; then
         echo "Available DEs:"
@@ -68,7 +88,7 @@ else
         echo "5) Cinnamon"
         echo "6) i3 window manager"
         echo "7) awesomeWM"
-        read -p "" de_choice
+        read -p "Select DE (1-7): " de_choice
         clear
 
         case $de_choice in
@@ -86,7 +106,7 @@ else
             echo "Installing selected DE..."
             pacman -Syu --noconfirm $packages
             
-            # turning display manager on
+            # Включение display manager
             if [[ "$de_choice" == 1 || "$de_choice" == 4 || "$de_choice" == 6 || "$de_choice" == 7 ]]; then
                 systemctl enable sddm
             elif [[ "$de_choice" == 2 ]]; then
@@ -97,8 +117,7 @@ else
         fi
     fi
 
-    # additional packages
-    
+    # Дополнительные пакеты
     clear
     echo "Installing common useful packages..."
     pacman -Syu --noconfirm \
@@ -116,23 +135,25 @@ else
     systemctl enable NetworkManager
     clear
 
-    # sudo
+    # Настройка sudo
     echo "Configuring sudo for wheel group..."
     sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
-    # installing yay and flatpak
+    # Установка yay и flatpak
     clear
-    echo "installing yay"
-    git clone https://aur.archlinux.org/yay.git
-    cd yay
-    makepkg -si
+    echo "Installing yay..."
+    sudo -u "$username" git clone https://aur.archlinux.org/yay.git /home/"$username"/yay
+    cd /home/"$username"/yay
+    sudo -u "$username" makepkg -si --noconfirm
+    cd ~
+    rm -rf /home/"$username"/yay
     
     clear
-    echo "installing flatpak"
-    sudo pacman -S --noconfirm flatpak
+    echo "Installing flatpak..."
+    pacman -S --noconfirm flatpak
 
-    # installation complete
-    echo "Installation complete"
+    # Завершение установки
+    echo "Installation complete!"
     read -p "Press Enter to reboot..."
     reboot
 fi
