@@ -1,24 +1,5 @@
 #!/bin/bash
 
-read -sp "Enter root password: " rootpass
-arch-chroot /mnt bash -c "echo 'root:$rootpass' | chpasswd"
-unset rootpass
-
-# Writing bootloader
-mkdir -p /mnt/boot/loader
-cat > /mnt/boot/loader/loader.conf <<EOF
-default arch
-timeout 5
-EOF
-clear
-
-# reflector adds new mirrors
-reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
-
-read -p "Linux kernel installation finished"
-sleep 5
-clear
-
 # Путь установки
 INSTALL_DIR="/tmp/InstallScript"
 
