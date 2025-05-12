@@ -32,6 +32,7 @@ bootctl install
 exit
 CHROOT
 
+# Writing bootloader
 mkdir -p /mnt/boot/loader
 cat > /mnt/boot/loader/loader.conf <<EOF
 default arch
