@@ -108,7 +108,8 @@ else
         openssh \
         networkmanager \
         pulseaudio \
-        pavucontrol
+        pavucontrol \
+        reflector
     systemctl enable NetworkManager
     clear
 
