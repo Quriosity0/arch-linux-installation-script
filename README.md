@@ -3,10 +3,13 @@
 
 this script can help you install Arch Linux on your computer
 
-to run this script, copy it with git/curl
+to run this script, copy it with git
 
 ```
 git clone https://github.com/Quriosity0/arch-linux-installation-script.git
+```
+or with curl
+```
 curl -O https://raw.githubusercontent.com/Quriosity0/arch-linux-installation-script/main
 ```
 
