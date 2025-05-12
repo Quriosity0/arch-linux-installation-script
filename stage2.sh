@@ -23,10 +23,10 @@ mkinitcpio -P
 exit
 CHROOT
 
-echo "Enter root pasword"
+echo "Enter root password: "
+stty -echo
 arch-chroot /mnt passwd
-arch-chroot /mnt bootctl install
-clear
+stty echo
 
 # Writing bootloader
 mkdir -p /mnt/boot/loader
