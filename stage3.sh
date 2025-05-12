@@ -129,7 +129,7 @@ else
     
     clear
     echo "installing flatpak"
-    sudo pacman -S flatpak
+    sudo pacman -S --noconfirm flatpak
 
     # installation complete
     echo "Installation complete"
