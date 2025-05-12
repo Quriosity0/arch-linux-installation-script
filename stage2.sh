@@ -4,7 +4,6 @@ clear
 pacman -Sy --noconfirm reflector
 pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bash-completion
 genfstab -U /mnt >> /mnt/etc/fstab
-reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
 
 # Generating fstab
 genfstab -U /mnt >> /mnt/etc/fstab
