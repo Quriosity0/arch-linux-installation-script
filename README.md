@@ -1,6 +1,8 @@
 # Quriosity's Arch Linux installation script
 ## WARNING! This script can destroy your data! Make backups for your data before installation!
 
+# WARNING! THIS SCRIPT IS STILL IN ACTIVE DEVELOPEMENT. ANYTHING MAY NOT WORK. TEST IT ONLY ON VM
+
 this script can help you install Arch Linux on your computer
 
 to run this script, copy it with git
