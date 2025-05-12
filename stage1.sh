@@ -71,8 +71,6 @@ clear
 
 echo "Verifying mounts:"
 lsblk -o NAME,MOUNTPOINT "$DISK"
-echo -e "\nSwap status:"
-swapon --show
 sleep 5
 clear
 
