@@ -69,10 +69,6 @@ mount --mkdir "$EFI_PART" /mnt/boot || { echo "Failed to mount EFI"; exit 1; }
 swapon "$SWAP_PART" || { echo "Failed to activate swap"; exit 1; }
 clear
 
-# Генерация fstab
-echo "Generating /etc/fstab..."
-genfstab -U /mnt >> /mnt/etc/fstab || { echo "Failed to generate fstab!"; exit 1; }
-
 echo "Verifying mounts:"
 lsblk -o NAME,MOUNTPOINT "$DISK"
 echo -e "\nSwap status:"

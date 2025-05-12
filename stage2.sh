@@ -6,6 +6,9 @@ pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bas
 genfstab -U /mnt >> /mnt/etc/fstab
 reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
 
+# Generating fstab
+genfstab -U /mnt >> /mnt/etc/fstab
+
 # Chrooting into system
 arch-chroot /mnt <<'CHROOT'
 ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
