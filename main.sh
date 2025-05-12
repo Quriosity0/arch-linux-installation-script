@@ -91,6 +91,7 @@ else
         if check_internet; then
             echo "WiFi connection successful!"
             sleep 5
+            chmod +x stage1.sh
             ./stage1.sh
         else
             echo "FAILED: Could not connect to the internet. Please connect manually and rerun the script."
