@@ -8,6 +8,7 @@ reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
 
 # Generating fstab
 genfstab -U /mnt >> /mnt/etc/fstab
+clear
 
 # Chrooting into system
 arch-chroot /mnt <<'CHROOT'
@@ -26,6 +27,7 @@ CHROOT
 echo "Enter root pasword"
 arch-chroot /mnt passwd
 arch-chroot /mnt bootctl install
+clear
 
 # Writing bootloader
 mkdir -p /mnt/boot/loader
@@ -33,6 +35,7 @@ cat > /mnt/boot/loader/loader.conf <<EOF
 default arch
 timeout 5
 EOF
+clear
 
 # reflector adds new mirrors
 reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
