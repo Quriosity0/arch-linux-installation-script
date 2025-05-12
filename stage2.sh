@@ -24,13 +24,18 @@ echo KEYMAP=us > vconsole.conf
 echo asus-pc > hostname
 
 mkinitcpio -P
+exit
+CHROOT
 
 echo "enter new root password"
+
+arch-chroot /mnt <<'CHROOT'
 passwd
 
 bootctl install
 exit
 CHROOT
+
 
 # Writing bootloader
 mkdir -p /mnt/boot/loader
