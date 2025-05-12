@@ -2,7 +2,7 @@
 
 clear
 pacman -Sy --noconfirm reflector
-pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bash-completion pacstrap -K /mnt base linux linux-firmware --parallel-downloads=15
+pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bash-completion pacstrap -K /mnt base linux linux-firmware
 genfstab -U /mnt >> /mnt/etc/fstab
 reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
 
