@@ -27,9 +27,16 @@ if [ ${#missing_files[@]} -gt 0 ]; then
     exit 1
 fi
 
-cp /tmp/InstallScript/RequiredFiles/locale.conf /etc/
-cp /tmp/InstallScript/RequiredFiles/vconsole.conf /etc/
-cp /tmp/InstallScript/RequiredFiles/hostname /etc/
+
+# cp /tmp/InstallScript/RequiredFiles/locale.conf /etc/
+cd /etc/
+echo LANG=en_US.UTF-8 > locale.conf
+
+# cp /tmp/InstallScript/RequiredFiles/vconsole.conf /etc/
+echo KEYMAP=us > vconsole.conf
+
+# cp /tmp/InstallScript/RequiredFiles/hostname /etc/
+echo asus-pc > hostname
 
 mkinitcpio -P
 
@@ -37,6 +44,7 @@ echo "enter new root password"
 passwd
 
 bootctl install
+exit
 CHROOT
 
 cat > /mnt/boot/loader/loader.conf <<EOF
