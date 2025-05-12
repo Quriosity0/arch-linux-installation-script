@@ -54,6 +54,7 @@ EOF
 
 read -p "Linux kernel installation finished"
 sleep 4
+chmod +x stage3.sh
 ./stage3.sh
 clear
 

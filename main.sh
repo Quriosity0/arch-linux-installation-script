@@ -80,6 +80,7 @@ else
     if check_internet; then
         echo "Ethernet connection successful!"
         sleep 5
+        chmod +x stage1.sh
         ./stage1.sh
         exit 0
     else
