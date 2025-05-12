@@ -1,8 +1,11 @@
 #!/bin/bash
 
 clear
+pacman -Sy --noconfirm reflector
+reflector --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
 pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bash-completion pacstrap -K /mnt base linux linux-firmware --parallel-downloads=15
 genfstab -U /mnt >> /mnt/etc/fstab
+reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
 
 arch-chroot /mnt <<'CHROOT'
 clear
