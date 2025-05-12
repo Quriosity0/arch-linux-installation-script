@@ -20,7 +20,6 @@ echo LANG=en_US.UTF-8 > /etc/locale.conf
 echo KEYMAP=us > /etc/vconsole.conf
 echo arch-pc > /etc/hostname
 mkinitcpio -P
-exit
 CHROOT
 
 read -sp "Enter root password: " rootpass
