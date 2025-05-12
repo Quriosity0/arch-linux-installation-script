@@ -1,7 +1,7 @@
 #!/bin/bash
 
 clear
-pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bash-completion
+pacstrap -K /mnt base base-devel linux linux-firmware linux-headers nano vim bash-completion pacstrap -K /mnt base linux linux-firmware --parallel-downloads=15
 genfstab -U /mnt >> /mnt/etc/fstab
 
 arch-chroot /mnt <<'CHROOT'
