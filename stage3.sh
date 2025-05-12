@@ -54,7 +54,8 @@ else
     sleep 2
     clear
 
-    # 
+    # настройка параллельной загрузки в pacman
+    # sed -i 's/^#\?ParallelDownloads = .*/ParallelDownloads = 10/' /etc/pacman.conf
 
     # установка DE
     read -p "Would you like to install a desktop environment? (Y/n): " install_de
