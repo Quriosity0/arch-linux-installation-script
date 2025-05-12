@@ -3,18 +3,18 @@
 set -e
 clear
 
-# Определяем путь к установочным файлам
+# finding installation path
 INSTALL_DIR="/tmp/InstallScript"
 
-# Проверяем, что мы в chroot
+# Checking chroot or not
 if ! grep -q '/mnt' /proc/mounts; then
-    # Если не в chroot, копируем файлы в новую систему
+    # if not - copying files into system
     echo "Copying installation files to the new system..."
     mkdir -p /mnt"$INSTALL_DIR"
     cp -r "$INSTALL_DIR"/* /mnt"$INSTALL_DIR"/
     chmod +x /mnt"$INSTALL_DIR"/*.sh
 
-    # Создаём автозапуск после перезагрузки
+    # creating autostart service
     echo "Setting up auto-start after reboot..."
     cat > /mnt/etc/systemd/system/continue_install.service <<EOF
 [Unit]
@@ -30,7 +30,7 @@ WorkingDirectory=$INSTALL_DIR
 WantedBy=multi-user.target
 EOF
 
-    # Включаем сервис для однократного запуска
+    # turning service on
     arch-chroot /mnt systemctl enable continue_install.service
 
     echo "Installation files copied. The system will now reboot."
@@ -40,12 +40,12 @@ EOF
 else
     echo "Continuing installation..."
     
-    # Отключаем сервис автозапуска
+    # turning service off
     systemctl disable continue_install.service
     rm /etc/systemd/system/continue_install.service
     clear
     
-    # создание пользователя
+    # creating user
     echo "creating new user"
     read -p "Enter username: " username
     useradd -m -G wheel "$username"
@@ -54,10 +54,10 @@ else
     sleep 2
     clear
 
-    # настройка параллельной загрузки в pacman
-    # sed -i 's/^#\?ParallelDownloads = .*/ParallelDownloads = 10/' /etc/pacman.conf
+    # changing parallel downloads for pacman
+    # sed -i 's/^#\?ParallelDownloads = .*/ParallelDownloads = 15/' /etc/pacman.conf
 
-    # установка DE
+    # installing DE/WM
     read -p "Would you like to install a desktop environment? (Y/n): " install_de
     if [[ "$install_de" =~ ^[Yy]$ || -z "$install_de" ]]; then
         echo "Available DEs:"
@@ -86,7 +86,7 @@ else
             echo "Installing selected DE..."
             pacman -Syu --noconfirm $packages
             
-            # Включение display manager
+            # turning display manager on
             if [[ "$de_choice" == 1 || "$de_choice" == 4 || "$de_choice" == 6 || "$de_choice" == 7 ]]; then
                 systemctl enable sddm
             elif [[ "$de_choice" == 2 ]]; then
@@ -97,7 +97,7 @@ else
         fi
     fi
 
-    # Дополнительные пакеты
+    # additional packages
     
     clear
     echo "Installing common useful packages..."
@@ -116,11 +116,11 @@ else
     systemctl enable NetworkManager
     clear
 
-    # Настройка sudo
+    # sudo
     echo "Configuring sudo for wheel group..."
     sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
-    # Установка yay и flatpak
+    # installing yay and flatpak
     clear
     echo "installing yay"
     git clone https://aur.archlinux.org/yay.git
@@ -131,7 +131,7 @@ else
     echo "installing flatpak"
     sudo pacman -S flatpak
 
-    # установка завершена
+    # installation complete
     echo "Installation complete"
     read -p "Press Enter to reboot..."
     reboot
