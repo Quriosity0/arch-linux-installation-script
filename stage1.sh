@@ -79,7 +79,6 @@ clear
 # переход к stage2
 echo "Starting stage2..."
 if [ -f ./stage2.sh ]; then
-    chmod +x stage2.sh
     ./stage2.sh
 else
     echo "Error: stage2.sh not found!"

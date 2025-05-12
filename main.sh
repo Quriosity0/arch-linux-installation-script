@@ -26,6 +26,7 @@ if [[ "$(pwd)" != "/tmp/InstallScript" ]]; then
     chmod +x main.sh
     chmod +x stage1.sh
     chmod +x stage2.sh
+    chmod +x stage3.sh
     sleep 2
     ./main.sh
 fi
@@ -91,7 +92,6 @@ else
         if check_internet; then
             echo "WiFi connection successful!"
             sleep 5
-            chmod +x stage1.sh
             ./stage1.sh
         else
             echo "FAILED: Could not connect to the internet. Please connect manually and rerun the script."
