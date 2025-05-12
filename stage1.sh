@@ -73,7 +73,7 @@ echo "Verifying mounts:"
 lsblk -o NAME,MOUNTPOINT "$DISK"
 echo -e "\nSwap status:"
 swapon --show
-sleep 2
+sleep 5
 clear
 
 # переход к stage2
