@@ -40,7 +40,7 @@ EOF
     echo "Installation files copied. The system will now reboot."
     echo "After reboot, the installation will continue automatically."
     read -p "Press Enter to reboot..."
-    reboot
+    shutdown -r now
 else
     # Если мы уже в новой системе — продолжаем установку
     echo "Continuing installation..."
