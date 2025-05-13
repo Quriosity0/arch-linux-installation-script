@@ -22,7 +22,6 @@ chroot_exec() {
     }
 }
 
-
 # Chrooting into system
 chroot_exec "ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime"
 chroot_exec "hwclock --systohc"
@@ -34,9 +33,13 @@ chroot_exec "echo KEYMAP=us > /etc/vconsole.conf"
 chroot_exec "echo arch-pc > /etc/hostname"
 chroot_exec "mkinitcpio -P"
 
+# setting root password
 read -sp "Enter root password: " rootpass
 arch-chroot /mnt bash -c "echo 'root:$rootpass' | chpasswd"
 unset rootpass
+
+# installing bootloader
+chroot_exec "bootctl install"
 
 # unmounting /dev /poc /sys partitions
 umount -R /mnt/dev /mnt/proc /mnt/sys
