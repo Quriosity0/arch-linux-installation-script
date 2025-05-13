@@ -4,15 +4,15 @@ clear
 loadkeys us
 echo "Welcome to Quriosity's Arch installation script"
 
-# Проверяем, запущен ли скрипт из /tmp/InstallScript
+# Checking, is script running in /tmp/InstallScript
 if [[ "$(pwd)" != "/tmp/InstallScript" ]]; then
     echo "Script is not running from /tmp/InstallScript - copying files..."
     sleep 2
 
-    # Очищаем предыдущую копию (если есть)
+    # Removing old InstallScript
     rm -rf /tmp/InstallScript
 
-    # Создаём директорию и копируем все файлы
+    # Copying files
     mkdir -p /tmp/InstallScript
     cp -r "$(dirname "$0")"/* /tmp/InstallScript/
 
@@ -33,16 +33,16 @@ fi
 
 echo "Checking internet connection..."
 
-# Функция проверки интернета
+# Checking network connection
 check_internet() {
     if ping -c 3 archlinux.org &> /dev/null; then
-        return 0  # Интернет есть
+        return 0
     else
-        return 1  # Интернета нет
+        return 1
     fi
 }
 
-# Функция для подключения к WiFi (если нет Ethernet)
+# Connecting to wifi (if there's no ethernet)
 connect_wifi() {
     echo "Trying to connect via WiFi..."
 
@@ -51,7 +51,7 @@ connect_wifi() {
         return 1
     fi
 
-    # Запускаем интерактивный WiFi-менеджер
+    # running iwctl and displaying tutorial
     echo "Please connect to WiFi manually in the iwctl shell. Example commands:"
     echo "  station list"
     echo "  station wlan0 scan"
@@ -64,7 +64,6 @@ connect_wifi() {
     clear
 }
 
-# Основная проверка интернета
 if check_internet; then
     echo "Internet connection detected!"
     sleep 5
@@ -73,10 +72,10 @@ if check_internet; then
 else
     echo "ERROR: No internet connection detected!"
 
-    # Попытка автоматического подключения через Ethernet (DHCP)
+    
     echo "Attempting to connect via Ethernet..."
-    dhcpcd  # Запускаем DHCP-клиент (для Ethernet)
-    sleep 5  # Ждём подключения
+    dhcpcd
+    sleep 5
 
     if check_internet; then
         echo "Ethernet connection successful!"
@@ -85,10 +84,8 @@ else
         ./stage1.sh
         exit 0
     else
-        # Если Ethernet не сработал, пробуем WiFi
         connect_wifi
 
-        # Проверяем снова
         if check_internet; then
             echo "WiFi connection successful!"
             sleep 5
