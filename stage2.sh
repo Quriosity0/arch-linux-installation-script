@@ -38,6 +38,9 @@ read -sp "Enter root password: " rootpass
 arch-chroot /mnt bash -c "echo 'root:$rootpass' | chpasswd"
 unset rootpass
 
+# unmounting /dev /poc /sys partitions
+umount -R /mnt/dev /mnt/proc /mnt/sys
+
 # Writing bootloader
 mkdir -p /mnt/boot/loader
 cat > /mnt/boot/loader/loader.conf <<EOF
