@@ -44,14 +44,6 @@ chroot_exec "bootctl install"
 # unmounting /dev /poc /sys partitions
 umount -R /mnt/dev /mnt/proc /mnt/sys
 
-# Writing bootloader
-mkdir -p /mnt/boot/loader
-cat > /mnt/boot/loader/loader.conf <<EOF
-default arch
-timeout 5
-EOF
-clear
-
 # reflector adds new mirrors
 reflector --latest 10 --sort rate --save /mnt/etc/pacman.d/mirrorlist
 
