@@ -1,62 +1,53 @@
 #!/bin/bash
+set -e
+clear
 
-# Путь установки
 INSTALL_DIR="/tmp/InstallScript"
 
-# Проверяем, что мы уже в новой системе (не в установочной среде)
-if [[ ! -f /etc/arch-release ]]; then
-    # Если ещё в установочной среде — копируем файлы и настраиваем автозапуск
-    echo "Copying installation files to the new system..."
+# Is in archiso
+if grep -q '/mnt' /proc/mounts; then
+    echo "Preparing your PC to first reboot"
+    
+    # Copying files
     mkdir -p /mnt"$INSTALL_DIR"
     cp -r "$INSTALL_DIR"/* /mnt"$INSTALL_DIR"/
     chmod +x /mnt"$INSTALL_DIR"/*.sh
 
-    # Создаём сервис в /mnt/etc (после перезагрузки это станет /etc)
-    echo "Setting up auto-start after reboot..."
+    # creating service
     cat > /mnt/etc/systemd/system/continue_install.service <<EOF
 [Unit]
-Description=Continue Arch Linux Installation
+Description=Continue Arch Installation
 After=network.target
 
 [Service]
 Type=simple
-ExecStart=/bin/bash $INSTALL_DIR/main.sh
+ExecStart=/bin/bash $INSTALL_DIR/stage3.sh
 WorkingDirectory=$INSTALL_DIR
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-    # Проверяем, что сервис создан
-    if [[ ! -f /mnt/etc/systemd/system/continue_install.service ]]; then
-        echo "ERROR: Failed to create service file!"
-        exit 1
-    fi
-
-    # Включаем сервис в chroot
-    arch-chroot /mnt systemctl daemon-reload
-    arch-chroot /mnt systemctl enable continue_install.service --now
-
-    echo "Installation files copied. The system will now reboot."
-    echo "After reboot, the installation will continue automatically."
+    # activating service
+    arch-chroot /mnt systemctl enable continue_install.service
+    echo "System will reboot to continue installation..."
     read -p "Press Enter to reboot..."
     shutdown -r now
+
 else
-    # Если мы уже в новой системе — продолжаем установку
-    echo "Continuing installation..."
+    # Second reboot
+    echo "Resuming installation..."
     
-    # Отключаем сервис (чтобы не запускался снова)
-    systemctl disable continue_install.service || true
-    rm -f /etc/systemd/system/continue_install.service
-    systemctl daemon-reload
+    # deleting service
+    systemctl disable continue_install.service --now
+    rm /etc/systemd/system/continue_install.service
     clear
     
-    # Создание пользователя
+    # creating user
     echo "Creating new user"
     read -p "Enter username: " username
     useradd -m -G wheel "$username"
     
-    # Безопасный ввод пароля
     while true; do
         read -sp "Enter password for $username: " password
         echo
@@ -107,7 +98,7 @@ else
             echo "Installing selected DE..."
             pacman -Syu --noconfirm $packages
             
-            # Включение display manager
+            # Enable display manager
             if [[ "$de_choice" == 1 || "$de_choice" == 4 || "$de_choice" == 6 || "$de_choice" == 7 ]]; then
                 systemctl enable sddm
             elif [[ "$de_choice" == 2 ]]; then
@@ -118,7 +109,7 @@ else
         fi
     fi
 
-    # Дополнительные пакеты
+    # Additional packages
     clear
     echo "Installing common useful packages..."
     pacman -Syu --noconfirm \
@@ -136,11 +127,11 @@ else
     systemctl enable NetworkManager
     clear
 
-    # Настройка sudo
+    # sudo
     echo "Configuring sudo for wheel group..."
     sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
-    # Установка yay и flatpak
+    # installing yay and flatpak
     clear
     echo "Installing yay..."
     cd /home/"$username" || echo "directory not found"
@@ -154,7 +145,7 @@ else
     echo "Installing flatpak..."
     pacman -S --noconfirm flatpak
 
-    # Завершение установки
+    # Installation complete!
     echo "Installation complete!"
     read -p "Press Enter to reboot..."
     reboot
